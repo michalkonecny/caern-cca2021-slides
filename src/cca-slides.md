@@ -90,7 +90,7 @@ $$
 
 ## Why *certified* exact real computation?
 
-Limits, non-determinism can easily go wrong 
+Limits, non-determinism can easily go wrong
 <br/>
 → formal verification worthwhile
 
@@ -202,12 +202,15 @@ e.g.:
 
 * concrete using names
   * e.g., `$\scriptsize R = \{\xi : N \to Q \,|\,\xi \text{ is fast convergent} \} / (==)$`
+  
   * the quotient often ignored, working with names
 
 * abstract using axioms
-  * e.g., R is an Archimedean ordered field 
-    * computational: 0,1 : R, + : R → R → R, ...
-    * specification: +-comm, ...
+  * e.g., $R$ is an Archimedean ordered field 
+    * computational: &nbsp; `$\scriptsize 0,1 : R,\, + : R → R → R,\,\ldots$`
+
+    * specification: &nbsp; `$\scriptsize+\text{-comm} : \forall x\,y, x{+}y = y{+}x,\,\ldots$`
+
 ----
 
 ### Types of real numbers
@@ -215,11 +218,13 @@ e.g.:
 
 * concrete using names
 * abstract using axioms
-  * e.g., R is an Archimedean ordered field 
-    * computational: 0,1 : R, + : R → R → R, ...
-    * specification: +-comm, ...
+  * e.g., $R$ is an Archimedean ordered field 
+    * computational: &nbsp; `$\scriptsize 0,1 : R,\, + : R → R → R,\,\ldots$`
+
+    * specification: &nbsp; `$\scriptsize+\text{-comm} : \forall x\,y, x{+}y = y{+}x,\,\ldots$`
+
   * or axioms corresponding to more convenient/efficient real operations
-    * e.g., of_Q : Q → R
+    * e.g., `$\scriptsize\mathrm{of\_Q} : Q → R$`
 
 ----
 
@@ -229,8 +234,8 @@ e.g.:
 * concrete using names
 * abstract using axioms
   * notion of equality
-    * extensional: x = y with x < y ∨ x = y ∨ x > y
-    * intensional: x == y := ¬ (x > y) ∧ ¬ (x < y)
+    * extensional: `$\scriptsize x = y \text{ with } x < y ∨ x = y ∨ x > y$`
+    * intensional: `$\scriptsize x == y  \;:=\;  ¬ (x > y) ∧ ¬ (x < y)$`
 
 <img src="diags/names.png" width="50%">
 
