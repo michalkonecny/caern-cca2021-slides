@@ -7,3 +7,13 @@ Slides for a talk at CCA 2021.
 In the slides, pressing "?" lists controls for navigation and presentation tools.
 
 The slides are made with [reveal.js](https://revealjs.com/).
+
+## How to edit
+
+The content is defined by the following files:
+
+* `docs/cca-slides.md`
+
+* `docs/diags/*.svg`
+
+* `docs/index.html`  (only plugins and global settings)
