@@ -107,7 +107,7 @@ Limits, non-determinism can easily go wrong
   * Readable algorithms
 
 * Fast execution 
-  * eg like iRRAM, CDAR, AERN
+  * eg like iRRAM, Ariadne, CDAR, AERN
 
 >>>>
 
@@ -126,7 +126,7 @@ Limits, non-determinism can easily go wrong
 ### Logic (1/2)
 
 * HOL
-  * `max : R → R → R := `... (program)
+  * `max : R → R → R :=` ... (program)
   * `Theorem max_meets_spec:`
     * `$\scriptsize\forall x\, y: (x>y \implies r=x)\land\ldots$`
       * where `$\scriptsize r=\text{max}\, x\, y$`
