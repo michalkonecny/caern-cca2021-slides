@@ -21,6 +21,7 @@ $headingColor: #fff;
 
 $mainFontSize: 36px;
 $mainFont: Ubuntu, 'sans-serif';
+$heading1TextShadow: 10px 10px 10px black;
 $headingTextShadow: 0px 0px 15px pink;
 $headingLetterSpacing: normal;
 $headingTextTransform: none;
@@ -29,10 +30,10 @@ $linkColor: #42affa;
 $linkColorHover: lighten( $linkColor, 15% );
 $selectionBackgroundColor: lighten( $linkColor, 25% );
 
-$heading1Size: 2.7em;
-$heading2Size: 1.8em;
-$heading3Size: 1.4em;
-$heading4Size: 1.0em;
+$heading1Size: 2.4em;
+$heading2Size: 1.7em;
+$heading3Size: 1.3em;
+$heading4Size: 1.1em;
 
 // Change text colors against light slide backgrounds
 @include light-bg-text-color(#222);

@@ -1,8 +1,10 @@
 # From Coq Proofs to Certified Exact Real Computation in AERN
 
-|Michal Konečný   | Sewon Park | Holger Thies     |
+<br/>
+
+|Michal Konečný|Sewon Park|Holger Thies|
 |:---------------:|:----------:|:----------------:|
-|Aston University | KAIST      | Kyoto University |
+|Aston University|KAIST|Kyoto University|
 
 ----
 
@@ -432,7 +434,7 @@ Axiom limit :
 
 Non-deterministic sequence, deterministic result
 
-```Coq [8-10,13|8-13]
+```Coq [8-10,12|8-12]
 Definition countableLiftM : 
   ∀ P : nat -> Type, (∀ n, M (P n)) -> M (∀ n, P n).
 
@@ -441,10 +443,9 @@ Axiom limit :
     is_fast_cauchy_p f -> {x | is_fast_limit_p x f}.
 
 Definition mslimit :
-  forall (P : Real -> Prop),
-    (exists! z, P z) ->
-    (forall n, 
-      M {e | (exists z, P z /\ dist e z <= prec n)}) -> 
+  ∀ (P : Real -> Prop),
+    (∃! z, P z) ->
+    (∀ n, M {e | (∃ z, P z /\ dist e z <= prec n)}) -> 
     {z | P z}.
 ```
 
@@ -464,6 +465,16 @@ realmax_nondeterministic x y =
 ----
 
 ### Relating standard reals
+
+* Coq standard library reals have:
+
+```Coq
+∀ x : R, 0 < x → { y | x = y * y }
+```
+
+We want this, but *!!! Mixing Set and Prop !!!*
+
+* ∇ monad takes it safely to Set using classical reasoning
 
 >>>>
 
