@@ -1,7 +1,7 @@
 # From Coq Proofs to Certified Exact Real Computation in AERN
 
 |Michal Konečný   | Sewon Park | Holger Thies     |
-:----------------:|:----------:|:----------------:|
+|:---------------:|:----------:|:----------------:|
 |Aston University | KAIST      | Kyoto University |
 
 ----
@@ -257,6 +257,7 @@ e.g.:
 <img src="diags/overview-trusted-base.svg" width="100%">
 
 Notes:
+
 * CoRN, Incone execution inside Coq
   * trusts: Coq core, Coq VM
 
@@ -275,8 +276,169 @@ Notes:
 * Key verification features
 
 ----
-
+<!-- .slide: data-auto-animate -->
 ### Key programming features
+
+#### Reals (constructive field)
+
+```Coq
+Parameter Real : Set.
+Parameter Real0 : Real.
+Parameter Realplus : Real -> Real -> Real.
+...
+```
+
+(more to follow)
+
+----
+<!-- .slide: data-auto-animate -->
+### Reals (constructive field)
+
+```Coq
+Parameter Real : Set.
+Parameter Real0 : Real.
+Parameter Realplus : Real -> Real -> Real.
+...
+```
+
+### Order and identity (classical)
+
+```Coq
+Parameter Reallt : Real -> Real -> Prop. (* Notation "<" *)
+Axiom Realtotal_order : 
+  ∀ r1 r2 : Real, r1 < r2 \/ r1 = r2 \/ r2 < r1.
+```
+
+----
+<!-- .slide: data-auto-animate -->
+### Reals (constructive field)
+
+```Coq
+Parameter Real : Set.
+Parameter Real0 : Real.
+Parameter Realplus : Real -> Real -> Real.
+...
+```
+
+### Order and identity (classical)
+
+```Coq
+Parameter Reallt : Real -> Real -> Prop. (* Notation "<" *)
+Axiom Realtotal_order : 
+  ∀ r1 r2 : Real, r1 < r2 \/ r1 = r2 \/ r2 < r1.
+```
+
+| classical  |  constructive |
+|:--:|:--:|
+| `x<y : Prop` | `semidec(x<y) : Set` |
+
+----
+
+### Semidecidable tests, partial functions
+
+| classical  |  constructive |
+|:--:|:--:|
+| `x<y : Prop` | `semidec(x<y) : Set` |
+
+```Coq [1-3|5-7|9,11|9,13]
+Parameter K : Set.
+Parameter trueK : K.
+Parameter falseK : K.
+ 
+Definition upK : K -> Prop := fun k : K => k = trueK.
+ 
+Definition semidec := fun P : Prop => {k : K | upK k <-> P}.
+
+Usage:
+
+Axiom Reallt_semidec : ∀ x y : Real, semidec (x < y).
+
+Parameter Realinv : ∀ {z}, z <> Real0 -> Real.
+```
+
+----
+
+### Non-deterministic choice
+
+* two Kleeneans, at least one is True (classically)
+* can non-deterministically choose (constructively):
+
+```Coq [1-2|4-6|8-12]
+Parameter select : 
+  ∀ k l : K, upK k \/ upK l -> M ({ upK k } + { upK l }).
+ 
+Definition choose : 
+  ∀ p q, semidec p -> semidec q -> p \/ q -> M ({p}+{q}).  
+Proof. ... (* using select *)
+
+Usage:
+
+Definition M_split : 
+  ∀ x y ε, ε > Real0 -> M ({x > y-ε} + {y > x-ε}).
+Proof. ... (* using choose *)
+
+```
+
+----
+
+### Multivalued/non-deterministic computation monad
+
+```Coq [1-5|7|9-10]
+Parameter M : Type -> Type.
+Parameter liftM : ∀ A B, (A -> B) -> M A -> M B.
+Parameter unitM : ∀ T : Type, T -> M T.
+Parameter multM : ∀ T : Type, M (M T) -> M T.
+...
+
+Definition singletonM : ∀ A, isSubsingleton A -> M A -> A.
+
+Definition countableLiftM : 
+  ∀ P : nat -> Type, (∀ n, M (P n)) -> M (∀ n, P n).
+```
+
+----
+
+### Limit
+
+```Coq [1-2|4-5|7-9]
+Definition is_fast_cauchy_p (f : nat -> Real) := 
+  ∀ n m, | f n - f m | <= prec n + prec m.
+
+Definition is_fast_limit_p (x : Real) (f : nat -> Real) := 
+  ∀ n, | x - f n | <= prec n.
+ 
+Axiom limit :
+  ∀ f : nat -> Real, 
+    is_fast_cauchy_p f -> {x | is_fast_limit_p x f}.
+```
+
+`prec n = ` $2^{-n}$
+
+----
+
+### `mslimit`
+
+Non-deterministic sequence, deterministic result
+
+```Coq [8-14]
+Definition countableLiftM : 
+  ∀ P : nat -> Type, (∀ n, M (P n)) -> M (∀ n, P n).
+
+Axiom limit :
+  ∀ f : nat -> Real, 
+    is_fast_cauchy_p f -> {x | is_fast_limit_p x f}.
+
+Definition mslimit :
+  forall (P : Real -> Prop),
+    (exists! z, P z) ->
+    ((forall n, 
+      M {e | (exists a : Real, P a /\ dist e a <= prec n)}) 
+     -> 
+     {a : Real | P a}).
+```
+----
+
+### Maximum via `mslimit`
 
 ----
 
