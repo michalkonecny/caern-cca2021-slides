@@ -6,7 +6,7 @@ Slides for a talk at CCA 2021.
 
 In the slides, pressing "?" lists controls for navigation and presentation tools.
 
-The slides are made with [reveal.js](https://revealjs.com/).
+The slides are made with [reveal.js](https://revealjs.com/) and [reveal.js-plugins](https://github.com/rajgoel/reveal.js-plugins).
 
 ## How to edit
 
@@ -17,6 +17,8 @@ The content is defined by the following files:
 * `docs/diags/*.svg`
 
 * `docs/index.html`  (only plugins and global settings)
+
+* `docs/css/theme/source/mk.scss`  (custom theme)
 
 To view the slides locally, start a local server as follows:
 
