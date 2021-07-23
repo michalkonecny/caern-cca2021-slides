@@ -440,6 +440,14 @@ Definition mslimit :
 
 ### Maximum via `mslimit`
 
+```Haskell
+realmax_nondeterministic x y =
+ limit $ \n ->
+   if select (x > y - 0.5^n) (y > x - 0.5^n)
+                then x      else y
+```
+<img src="diags/realmax-coq-outline.png" width="50%">
+
 ----
 
 ### Key verification features
