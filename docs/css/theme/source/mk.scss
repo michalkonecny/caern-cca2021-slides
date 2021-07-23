@@ -1,0 +1,43 @@
+/**
+ * Custom theme derived from the black theme.
+ */
+
+
+// Default mixins and settings -----------------
+@import "../template/mixins";
+@import "../template/settings";
+// ---------------------------------------------
+
+
+// Include theme-specific fonts
+@import url(./fonts/source-sans-pro/source-sans-pro.css);
+
+
+// Override theme settings (see ../template/settings.scss)
+$backgroundColor: #502050;
+
+$mainColor: #fff;
+$headingColor: #fff;
+
+$mainFontSize: 36px;
+$mainFont: Ubuntu, 'sans-serif';
+$headingTextShadow: 0px 0px 15px pink;
+$headingLetterSpacing: normal;
+$headingTextTransform: none;
+$headingFontWeight: 400;
+$linkColor: #42affa;
+$linkColorHover: lighten( $linkColor, 15% );
+$selectionBackgroundColor: lighten( $linkColor, 25% );
+
+$heading1Size: 2.7em;
+$heading2Size: 1.8em;
+$heading3Size: 1.4em;
+$heading4Size: 1.0em;
+
+// Change text colors against light slide backgrounds
+@include light-bg-text-color(#222);
+
+
+// Theme template ------------------------------
+@import "../template/theme";
+// ---------------------------------------------

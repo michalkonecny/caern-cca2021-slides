@@ -9,7 +9,7 @@
 
 	<link rel="stylesheet" href="dist/reset.css">
 	<link rel="stylesheet" href="dist/reveal.css">
-	<link rel="stylesheet" href="dist/theme/black.css">
+	<link rel="stylesheet" href="dist/theme/mk.css">
 
 	<!-- Theme used for syntax highlighted code -->
 	<link rel="stylesheet" href="plugin/highlight/monokai.css">
@@ -20,8 +20,7 @@
 <body>
 	<div class="reveal">
 		<div class="slides">
-			<section data-markdown="cca-slides.md" data-separator="^>>>>" data-separator-vertical="^----"
-				data-background="#502050">
+			<section data-markdown="cca-slides.md" data-separator="^>>>>" data-separator-vertical="^----">
 				<!--
         Note that Windows uses `\r\n` instead of `\n` as its linefeed character.
         For a regex that supports all operating systems, use `\r?\n` instead of `\n`.
@@ -46,7 +45,12 @@
 		// - https://revealjs.com/config/
 		Reveal.initialize({
 			hash: true,
+			hashOneBasedIndex: true,
 			slideNumber: true,
+			mouseWheel: true,
+			transition: 'convex',
+			pdfMaxPagesPerSlide: 1,
+			pdfSeparateFragments: false,
 			math: {
 				mathjax: 'https://cdn.jsdelivr.net/gh/mathjax/mathjax@2.7.8/MathJax.js',
 				config: 'TeX-AMS_HTML-full',
