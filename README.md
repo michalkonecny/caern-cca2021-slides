@@ -17,3 +17,12 @@ The content is defined by the following files:
 * `docs/diags/*.svg`
 
 * `docs/index.html`  (only plugins and global settings)
+
+To view the slides locally, start a local server as follows:
+
+```
+cd docs/
+npm start
+```
+
+This requires a [node.js](https://nodejs.org/en/) installation.
