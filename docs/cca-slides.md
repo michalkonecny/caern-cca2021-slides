@@ -273,23 +273,25 @@ Notes:
 
 ### Access to classical theorems on $\RR$
 
-* Available in Incone and cAERN
-
 <img src="diags/overview-relator.svg" width="100%">
+
+* In cAERN, and (in another way) in Incone
 
 >>>>
 
 ## Our axiomatisation of constructive real numbers
 
-* Key programming features
-
-* Key verification features
+* Constructive real field
+* Order and identity (classical)
+* Semidecidable tests, partial functions
+* Non-deterministic choice
+* Multivalued/non-deterministic computation monad
+* Limit
+* Relating standard reals (`∇`, `relator`)
 
 ----
 <!-- .slide: data-auto-animate -->
-### Key programming features
-
-#### Reals (constructive field)
+### Constructive real field
 
 ```Coq
 Parameter Real : Set.
@@ -302,7 +304,7 @@ Parameter Realplus : Real -> Real -> Real.
 
 ----
 <!-- .slide: data-auto-animate -->
-### Reals (constructive field)
+### Constructive real field
 
 ```Coq
 Parameter Real : Set.
@@ -321,7 +323,7 @@ Axiom Realtotal_order :
 
 ----
 <!-- .slide: data-auto-animate -->
-### Reals (constructive field)
+### Constructive real field
 
 ```Coq
 Parameter Real : Set.
@@ -430,7 +432,7 @@ Axiom limit :
 
 Non-deterministic sequence, deterministic result
 
-```Coq [8-14]
+```Coq [8-10,13|8-13]
 Definition countableLiftM : 
   ∀ P : nat -> Type, (∀ n, M (P n)) -> M (∀ n, P n).
 
@@ -441,11 +443,11 @@ Axiom limit :
 Definition mslimit :
   forall (P : Real -> Prop),
     (exists! z, P z) ->
-    ((forall n, 
-      M {e | (exists a : Real, P a /\ dist e a <= prec n)}) 
-     -> 
-     {a : Real | P a}).
+    (forall n, 
+      M {e | (exists z, P z /\ dist e z <= prec n)}) -> 
+    {z | P z}.
 ```
+
 ----
 
 ### Maximum via `mslimit`
@@ -456,11 +458,12 @@ realmax_nondeterministic x y =
    if select (x > y - 0.5^n) (y > x - 0.5^n)
                 then x      else y
 ```
+
 <img src="diags/realmax-coq-outline.png" width="50%">
 
 ----
 
-### Key verification features
+### Relating standard reals
 
 >>>>
 
