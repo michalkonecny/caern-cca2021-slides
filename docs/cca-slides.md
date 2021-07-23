@@ -121,6 +121,8 @@ Limits, non-determinism can easily go wrong
 
 * size of trusted base
 
+* Access to classical theorems on $\RR$
+
 ----
 
 ### Logic (1/2)
@@ -163,9 +165,9 @@ Limits, non-determinism can easily go wrong
 
 e.g.:
 
-* `$\scriptsize\forall x y : \mathbb{R}, (x > y) \lor(x = y) \lor(x < y)$` &nbsp;&nbsp;&nbsp;&nbsp; OK
+* `$\scriptsize\forall x y : \RR, (x > y) \lor(x = y) \lor(x < y)$` &nbsp;&nbsp;&nbsp;&nbsp; OK
 
-* `$\scriptsize\forall x y : \mathbb{R}, \{x > y\} + \{x = y\} + \{x < y\}$` KO
+* `$\scriptsize\forall x y : \RR, \{x > y\} + \{x = y\} + \{x < y\}$` KO
 
 ----
 ### Logic (2/2)
@@ -254,7 +256,7 @@ e.g.:
 * CoRN, Incone - extraction to Haskell/OCaml
 * cAERN - extraction to Haskell + AERN2
 
-<img src="diags/overview-trusted-base.svg" width="100%">
+<img src="diags/overview-trusted-base.svg" width="80%">
 
 Notes:
 
@@ -266,6 +268,14 @@ Notes:
 
 * cAERN
   * trusts: + AERN (select, limit, etc), CDAR (MP interval arithmetic)
+
+----
+
+### Access to classical theorems on $\RR$
+
+* Available in Incone and cAERN
+
+<img src="diags/overview-relator.svg" width="100%">
 
 >>>>
 
