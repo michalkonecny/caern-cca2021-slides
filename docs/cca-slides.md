@@ -296,9 +296,9 @@ Notes:
 ### Constructive real field
 
 ```Coq
-Parameter Real : Set.
-Parameter Real0 : Real.
-Parameter Realplus : Real -> Real -> Real.
+Parameter CR : Set.
+Parameter Real0 : CR.
+Parameter Realplus : CR -> CR -> CR.
 ...
 ```
 
@@ -309,18 +309,18 @@ Parameter Realplus : Real -> Real -> Real.
 ### Constructive real field
 
 ```Coq
-Parameter Real : Set.
-Parameter Real0 : Real.
-Parameter Realplus : Real -> Real -> Real.
+Parameter CR : Set.
+Parameter Real0 : CR.
+Parameter Realplus : CR -> CR -> CR.
 ...
 ```
 
 ### Order and identity (classical)
 
 ```Coq
-Parameter Reallt : Real -> Real -> Prop. (* Notation "<" *)
+Parameter Reallt : CR -> CR -> Prop. (* Notation "<" *)
 Axiom Realtotal_order : 
-  ∀ r1 r2 : Real, r1 < r2 \/ r1 = r2 \/ r2 < r1.
+  ∀ r1 r2 : CR, r1 < r2 \/ r1 = r2 \/ r2 < r1.
 ```
 
 ----
@@ -328,18 +328,18 @@ Axiom Realtotal_order :
 ### Constructive real field
 
 ```Coq
-Parameter Real : Set.
-Parameter Real0 : Real.
-Parameter Realplus : Real -> Real -> Real.
+Parameter CR : Set.
+Parameter Real0 : CR.
+Parameter Realplus : CR -> CR -> CR.
 ...
 ```
 
 ### Order and identity (classical)
 
 ```Coq
-Parameter Reallt : Real -> Real -> Prop. (* Notation "<" *)
+Parameter Reallt : CR -> CR -> Prop. (* Notation "<" *)
 Axiom Realtotal_order : 
-  ∀ r1 r2 : Real, r1 < r2 \/ r1 = r2 \/ r2 < r1.
+  ∀ r1 r2 : CR, r1 < r2 \/ r1 = r2 \/ r2 < r1.
 ```
 
 | classical  |  constructive |
@@ -365,9 +365,9 @@ Definition semidec := fun P : Prop => {k : K | upK k <-> P}.
 
 Usage:
 
-Axiom Reallt_semidec : ∀ x y : Real, semidec (x < y).
+Axiom Reallt_semidec : ∀ x y : CR, semidec (x < y).
 
-Parameter Realinv : ∀ {z}, z <> Real0 -> Real.
+Parameter Realinv : ∀ {z}, z <> Real0 -> CR.
 ```
 
 ----
@@ -415,14 +415,14 @@ Definition countableLiftM :
 ### Limit
 
 ```Coq [1-2|4-5|7-9]
-Definition is_fast_cauchy_p (f : nat -> Real) := 
+Definition is_fast_cauchy_p (f : nat -> CR) := 
   ∀ n m, | f n - f m | <= prec n + prec m.
 
-Definition is_fast_limit_p (x : Real) (f : nat -> Real) := 
+Definition is_fast_limit_p (x : CR) (f : nat -> CR) := 
   ∀ n, | x - f n | <= prec n.
  
 Axiom limit :
-  ∀ f : nat -> Real, 
+  ∀ f : nat -> CR, 
     is_fast_cauchy_p f -> {x | is_fast_limit_p x f}.
 ```
 
@@ -439,11 +439,11 @@ Definition countableLiftM :
   ∀ P : nat -> Type, (∀ n, M (P n)) -> M (∀ n, P n).
 
 Axiom limit :
-  ∀ f : nat -> Real, 
+  ∀ f : nat -> CR, 
     is_fast_cauchy_p f -> {x | is_fast_limit_p x f}.
 
 Definition mslimit :
-  ∀ (P : Real -> Prop),
+  ∀ (P : CR -> Prop),
     (∃! z, P z) ->
     (∀ n, M {e | (∃ z, P z /\ dist e z <= prec n)}) -> 
     {z | P z}.
@@ -463,18 +463,62 @@ realmax_nondeterministic x y =
 <img src="diags/realmax-coq-outline.png" width="50%">
 
 ----
-
+<!-- .slide: data-auto-animate -->
 ### Relating standard reals
 
-* Coq standard library reals have:
-
+* For Coq standard reals we have:
 ```Coq
-∀ x : R, 0 < x → { y | x = y * y }
+∀ x : R, 0 < x → ({ y | x = y * y } : Set) (* Danger *)
+```
+  * Set depending on non-constructive axioms
+    * e.g. `∀ x y : R, {x<y}+{x=y}+{x>y}`
+
+* ∇ erases all such fake constructive aspects
+```
+∀ x : ∇R, ∇0 ∇< x → { y | x = y ∇* y }
+```
+* By `relate` axioms this implies what we need:
+```Coq
+∀ x : CR, 0 < x → (∃ y, x = y * y : Prop)
 ```
 
-We want this, but *!!! Mixing Set and Prop !!!*
+Notes:
 
-* ∇ monad takes it safely to Set using classical reasoning
+Sewon:
+To put formally, results from classical libraries that uses unrealizable axioms such as Set level law of excluded middle and so on live in Set in a different type theory.
+And, our relator brings it into Prop-level theorem in our constructive type theory by wrapping it with \nabla.
+
+----
+<!-- .slide: data-auto-animate -->
+### Relating standard reals
+<img src="diags/overview-relator.svg" width="80%">
+
+```Coq
+∀ x : R, 0 < x → ({ y | x = y * y } : Set) (* Danger *)
+                    ∀ x : ∇R, ∇0 ∇< x → { y | x = y ∇* y }
+                 ∀ x : CR, 0 < x → (∃ y, x = y * y : Prop)
+```
+
+----
+<!-- .slide: data-auto-animate -->
+### Relating standard reals
+
+`$$\nabla A :\equiv \{P : A \to \mathrm{Prop}\; |\; \exists!(x : A), P\; x\}$$`
+
+* $\nabla$ is an idempotent monad
+* Naturally defined lifting for constants, functions, rels
+
+```Coq [1|3|4-5|7|8-9]
+Definition totalR := {x : R | is_total x}.  (* avoid r/0 *)
+
+Parameter relator : CR → ∇ totalR.
+Axiom relator_mono : ∀ x y, relator x = relator y → x = y.
+Axiom relator_epi : ∀ y, ∃ x, y = relator x. 
+...
+Axiom relator_constant0 : relator Real0 = unit∇ _ totalR0.
+Axiom relator_addition : ∀ x y, relator (x + y) = 
+  (lift_binary∇ _ _ _ totalRadd) (relator x) (relator y).
+```
 
 >>>>
 
