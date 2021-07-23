@@ -8,7 +8,16 @@ In the slides, pressing "?" lists controls for navigation and presentation tools
 
 The slides are made with [reveal.js](https://revealjs.com/) and [reveal.js-plugins](https://github.com/rajgoel/reveal.js-plugins).
 
-## How to edit
+## Viewing locally
+
+```bash
+cd docs/
+npm start
+```
+
+This requires a [node.js](https://nodejs.org/en/) installation.
+
+## Editing
 
 The content is defined by the following files:
 
@@ -20,11 +29,4 @@ The content is defined by the following files:
 
 * `docs/css/theme/source/mk.scss`  (custom theme)
 
-To view the slides locally, start a local server as follows:
-
-```
-cd docs/
-npm start
-```
-
-This requires a [node.js](https://nodejs.org/en/) installation.
+The local server monitors these files.  The browser should automatically reload when they are modified.
