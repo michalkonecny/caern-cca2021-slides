@@ -6,29 +6,35 @@
 |:---------------:|:----------:|:----------------:|
 |Aston University|KAIST|Kyoto University|
 
-----
+Notes:
 
-### Outline
-<!-- .slide: data-auto-animate -->
-
-* Key features of exact real computation
-* Why *certified* exact real computation?
-* Approaches to certified exact real computation
-* Our axiomatisation of constructive real numbers
-* Quality of our certified programs
+Hello everyone,  I will talk about joint work with Sewon Park and Holger Thies on a new approach to developing certified exact real programs using the Coq proof assistant and the Haskell library AERN.
 
 ----
 
-### Outline
-<!-- .slide: data-auto-animate -->
+From Coq Proofs to <br/> Certified Exact Real Computation in AERN
 
-* Key features of exact real computation
-* Why *certified* exact real computation?
-* Approaches to certified exact real computation
-* Our axiomatisation of constructive real numbers
-  * Key programming features
-  * Key verification features
-* Quality of our certified programs
+<br/>
+
+### Plan
+
+1. Key features of *exact real computation*
+2. Why *certified* exact real computation?
+3. Our approach to certification vs others
+4. Our *axiomatisation* of constructive real numbers
+5. *Relating* constructive and classical real numbers
+6. *Quality* of our certified programs
+
+[https://michalkonecny.github.io/caern-cca2021-slides/](https://michalkonecny.github.io/caern-cca2021-slides/)
+
+Notes:
+
+1. The plan is to start with a reminder of what exact real computation looks like using a few examples, 
+2. and why it is desirable to do a formal verification / certification of such programs.
+3. Then I will review several existing approaches and show how ours differs from them,
+4. followed by key details of our approach, namely formal axiomatisation of the real numbers
+5. and their relation to standard classical real numbers present in Coq.
+6. Finally, I will evaluate the approach from various angles and outline further work.
 
 >>>>
 
@@ -37,28 +43,41 @@
 * By design, it avoids errors due to rounding
 * ... but it has its own subtleties.
 
+Notes:
+
+I do not need to introduce the concept of real numbers datatype and its benefits over approximate computation.
+Let us remind ourselves of its subtleties.
+
 ----
 
 ### Limits
 
 ```Haskell [-|2-3|5-10]
-restr_sqrt x = 
-  limit $ 
-    \n -> sqrt_approx_fast x n
- 
-sqrt_approx_fast x n =
- sqrt_approx x (1 + (integerLog2 (n+1)))
-  
 sqrt_approx x n =
  let heron_step y = (y + x/y)/2 in
  (iterate heron_step 1) !! n
-``` 
+
+sqrt_approx_fast x n =
+ sqrt_approx x (1 + (integerLog2 (n+1)))
+
+restr_sqrt x = -- restricted to 0.25 < x < 2
+  limit $ 
+    \n -> sqrt_approx_fast x n  
+```
 
 * fast approximation: $|\mathrm{error}| \leq \frac{1}{2^n}$
 
+Notes:
+
+Here we define the Heron method for approximating the square root of real number x by iterating n times.
+
+The square root function is defined as a limit of this function with increasing n.  The limit operator requires a fast-converging sequence of approximations.  While sqrt_approx produces a fast convergent sequence, it converges unnecessarily fast.  sqrt_approx_fast reduces the convergence rate closer to the rate required by the limit operator.
+
+It is easy to get this wrong and write a limit that does not produce valid a real number.  We need to certify that the sequence converges and that it convergences sufficiently fast.  
+
 ----
 
-### Semi-decidable comparisons -> parallelism/non-determinism
+### Semi-decidable comparisons → parallelism/non-determinism
 
 ```Haskell [1|3-4|4-5|6-8]
 realmax_parallel x y = if x < y then y else x
@@ -70,9 +89,17 @@ realmax_nondeterministic x y =
                 then x      
                             else y
 ```
-<a href="https://www.geogebra.org/calculator/eb52xeed"><img src="diags/max_fg.svg" width="70%" class="fragment" data-fragment-index="2"></a>
 
-----
+<img src="diags/max_fg.svg" width="60%" class="fragment" data-fragment-index="2">
+
+[Animated version](https://www.geogebra.org/calculator/eb52xeed)
+
+Note:
+
+Semi-decidability of order means that we cannot branch based on order the usual way.  This if-then-else actually works in AERN, but it is redefined to execute both branches in parallel while the lazy Boolean condition is undecided and merge the information from both branches, assuming that they compute the same number if the condition is never decided (ie x = y in this case).
+We need to certify this assumption if we use this approach.
+
+To avoid parallelism, we tend to use a limit and the select/choose command to compute an approximation.  A select is non-deterministic, ie the two semi-decidable conditions sometimes both hold and the select can choose freely between the branches.  Limit here has to work for a multi-valued function and we want a guarantee that the result is single-valued.
 
 ### Non-extensionality, search
 
