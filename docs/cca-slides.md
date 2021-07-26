@@ -18,23 +18,21 @@ From Coq Proofs to <br/> Certified Exact Real Computation in AERN
 
 ### Plan
 
-1. Key features of *exact real computation*
-2. Why *certified* exact real computation?
-3. Our approach to certification vs others
-4. Our *axiomatisation* of constructive real numbers
-5. *Relating* constructive and classical real numbers
-6. *Quality* of our certified programs
+1. Key features of *exact real computation*; why certify?
+2. Our approach to certification vs others
+3. Our *axiomatisation* of constructive real numbers
+4. *Relating* constructive and classical real numbers
+5. *Quality* of our certified programs
 
 [https://michalkonecny.github.io/caern-cca2021-slides/](https://michalkonecny.github.io/caern-cca2021-slides/)
 
 Notes:
 
-1. The plan is to start with a reminder of what exact real computation looks like using a few examples, 
-2. and why it is desirable to do a formal verification / certification of such programs.
-3. Then I will review several existing approaches and show how ours differs from them,
-4. followed by key details of our approach, namely formal axiomatisation of the real numbers
-5. and their relation to standard classical real numbers present in Coq.
-6. Finally, I will evaluate the approach from various angles and outline further work.
+1. The plan is to start with a reminder of what exact real computation looks like using a few examples, and why it is desirable to do a formal verification / certification of such programs.
+2. Then I will review several existing approaches and show how ours differs from them,
+3. followed by key details of our approach, namely formal axiomatisation of the real numbers
+4. and their relation to standard classical real numbers present in Coq.
+5. Finally, I will evaluate the approach from various angles and outline further work.
 
 >>>>
 
@@ -91,8 +89,8 @@ realmax_nondeterministic x y =
 ```
 
 <img src="diags/max_fg.svg" width="60%" class="fragment" data-fragment-index="2">
-
-[Animated version](https://www.geogebra.org/calculator/eb52xeed)
+<a href="https://www.geogebra.org/calculator/eb52xeed">
+$\tiny\text{(animated version)}$</a>
 
 Note:
 
@@ -101,21 +99,34 @@ We need to certify this assumption if we use this approach.
 
 To avoid parallelism, we tend to use a limit and the select/choose command to compute an approximation.  A select is non-deterministic, ie the two semi-decidable conditions sometimes both hold and the select can choose freely between the branches.  Limit here has to work for a multi-valued function and we want a guarantee that the result is single-valued.
 
+----
+
 ### Non-extensionality, search
 
 ```Haskell
-magnitude1 x = -- precondition: 0 < x < 0.5
+magnitude1 x =
  integer $ fromJust $ List.findIndex id $ map test [0..]
  where
  test n = select (0.5^(n+2) < x) (x < 0.5^(n+1))
 ```
 
-<a href="https://www.geogebra.org/m/cgqkwfeb"><img src="diags/magnitude1.png" width="45%"></a>
-$$\scriptsize
-\forall x, 0 < x \leq 0.5 \implies \frac{1}{2^{m_1(x)+2}} < x \leq \frac{1}{2^{m_1(x)}}
-$$
+<img src="diags/magnitude1.png" width="50%">
+<a href="https://www.geogebra.org/m/cgqkwfeb">
+$\tiny\text{(GeoGebra source)}$</a>
 
->>>>
+<!-- $$\scriptsize
+\forall x, 0 < x \leq 0.5 \implies \frac{1}{2^{m_1(x)+2}} < x \leq \frac{1}{2^{m_1(x)}}
+$$ -->
+
+Notes:
+
+This program computes a version **of integer logarithm** for x in this domain.  As integer logarithm (like the floor function) is discontinuous, we cannot compute it.  Instead we need to compute a multivalued (non-deterministic, non-extensional) version with a loosened specification.  Support for such non-extensional functions is unavoidable in ERC.
+
+Another notable feature of this program is **unguarded recursion/search**.  
+
+? This poses a challenge for formalization since proof assistants usually strongly encourage syntactically guarded recursion.
+
+----
 
 ## Why *certified* exact real computation?
 
@@ -125,9 +136,9 @@ Limits, non-determinism can easily go wrong
 
 ----
 
-### Our aims
+## Our aims
 
-* Reliability
+* Reliability via verification
   * Readable specification
   * Small trusted base
   
