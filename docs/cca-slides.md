@@ -297,8 +297,8 @@ Notes:
 
 ```Coq
 Parameter CR : Set.
-Parameter Real0 : CR.
-Parameter Realplus : CR -> CR -> CR.
+Parameter CR0 : CR.
+Parameter CR+ : CR -> CR -> CR.
 ...
 ```
 
@@ -310,16 +310,16 @@ Parameter Realplus : CR -> CR -> CR.
 
 ```Coq
 Parameter CR : Set.
-Parameter Real0 : CR.
-Parameter Realplus : CR -> CR -> CR.
+Parameter CR0 : CR.
+Parameter CR+ : CR -> CR -> CR.
 ...
 ```
 
 ### Order and identity (classical)
 
 ```Coq
-Parameter Reallt : CR -> CR -> Prop. (* Notation "<" *)
-Axiom Realtotal_order : 
+Parameter CRlt : CR -> CR -> Prop. (* Notation "<" *)
+Axiom CRtotal_order : 
   ∀ r1 r2 : CR, r1 < r2 \/ r1 = r2 \/ r2 < r1.
 ```
 
@@ -329,16 +329,16 @@ Axiom Realtotal_order :
 
 ```Coq
 Parameter CR : Set.
-Parameter Real0 : CR.
-Parameter Realplus : CR -> CR -> CR.
+Parameter CR0 : CR.
+Parameter CR+ : CR -> CR -> CR.
 ...
 ```
 
 ### Order and identity (classical)
 
 ```Coq
-Parameter Reallt : CR -> CR -> Prop. (* Notation "<" *)
-Axiom Realtotal_order : 
+Parameter CRlt : CR -> CR -> Prop. (* Notation "<" *)
+Axiom CRtotal_order : 
   ∀ r1 r2 : CR, r1 < r2 \/ r1 = r2 \/ r2 < r1.
 ```
 
@@ -365,9 +365,9 @@ Definition semidec := fun P : Prop => {k : K | upK k <-> P}.
 
 Usage:
 
-Axiom Reallt_semidec : ∀ x y : CR, semidec (x < y).
+Axiom CRlt_semidec : ∀ x y : CR, semidec (x < y).
 
-Parameter Realinv : ∀ {z}, z <> Real0 -> CR.
+Parameter CRinv : ∀ {z}, z <> CR0 -> CR.
 ```
 
 ----
@@ -388,7 +388,7 @@ Proof. ... (* using select *)
 Usage:
 
 Definition M_split : 
-  ∀ x y ε, ε > Real0 -> M ({x > y-ε} + {y > x-ε}).
+  ∀ x y ε, ε > CR0 -> M ({x > y-ε} + {y > x-ε}).
 Proof. ... (* using choose *)
 
 ```
@@ -473,13 +473,13 @@ realmax_nondeterministic x y =
   * Set depending on non-constructive axioms
     * e.g. `∀ x y : R, {x<y}+{x=y}+{x>y}`
 
-* ∇ erases all such fake constructive aspects
-```
-∀ x : ∇R, ∇0 ∇< x → { y | x = y ∇* y }
+* ∇ erases fake constructive aspects
+```Coq
+∀ x : ∇R, 0 < x → { y : ∇R | x = y * y } (* Safe *)
 ```
 * By `relate` axioms this implies what we need:
 ```Coq
-∀ x : CR, 0 < x → (∃ y, x = y * y : Prop)
+∀ x : CR, 0 < x → ((∃ y, x = y * y) : Prop)
 ```
 
 Notes:
@@ -494,9 +494,11 @@ And, our relator brings it into Prop-level theorem in our constructive type theo
 <img src="diags/overview-relator.svg" width="80%">
 
 ```Coq
-∀ x : R, 0 < x → ({ y | x = y * y } : Set) (* Danger *)
-                    ∀ x : ∇R, ∇0 ∇< x → { y | x = y ∇* y }
-                 ∀ x : CR, 0 < x → (∃ y, x = y * y : Prop)
+∀ x : R, 0 < x → ({ y | x = y * y } : Set) (* Decidable = *)
+
+    ∀ x : ∇R, 0 < x → { y : ∇R | x = y * y } (* Semidecidable = *)
+
+        ∀ x : CR, 0 < x → ((∃ y, x = y * y) : Prop)
 ```
 
 ----
@@ -506,18 +508,18 @@ And, our relator brings it into Prop-level theorem in our constructive type theo
 `$$\nabla A :\equiv \{P : A \to \mathrm{Prop}\; |\; \exists!(x : A), P\; x\}$$`
 
 * $\nabla$ is an idempotent monad
-* Naturally defined lifting for constants, functions, rels
+* $\nabla\text{Prop} = \text{Prop}$
+* Naturally defined lifting for constants, functions, relations
 
-```Coq [1|3|4-5|7|8-9]
-Definition totalR := {x : R | is_total x}.  (* avoid r/0 *)
-
-Parameter relator : CR → ∇ totalR.
-Axiom relator_mono : ∀ x y, relator x = relator y → x = y.
-Axiom relator_epi : ∀ y, ∃ x, y = relator x. 
+```Coq [1|3|4-5|7-8]
+Parameter relator : CR → ∇R. (* simplified version *)
 ...
-Axiom relator_constant0 : relator Real0 = unit∇ _ totalR0.
+Axiom relator_constant0 : relator CR0 = unit∇ 0.
 Axiom relator_addition : ∀ x y, relator (x + y) = 
-  (lift_binary∇ _ _ _ totalRadd) (relator x) (relator y).
+  (lift_binary∇ (+)) (relator x) (relator y).
+...
+Axiom relator_lt : ∀ x y, x < y = 
+  (lift_domain_binary∇ (<)) (relator x) (relator y).
 ```
 
 >>>>
