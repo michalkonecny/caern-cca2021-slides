@@ -468,18 +468,18 @@ realmax_nondeterministic x y =
 
 * For Coq standard reals we have:
 ```Coq
-∀ x : R, 0 < x → ({ y | x = y * y } : Set) (* Danger *)
+∀ x : ℝ, 0 < x → ({ y : ℝ | x = y * y } : Set)
 ```
   * Set depending on non-constructive axioms
-    * e.g. `∀ x y : R, {x<y}+{x=y}+{x>y}`
+    * e.g. `∀ x y : ℝ, {x<y}+{x=y}+{x>y}`
 
 * ∇ erases fake constructive aspects
 ```Coq
-∀ x : ∇R, 0 < x → { y : ∇R | x = y * y } (* Safe *)
+∀ x : ∇ℝ, 0 < x → ({ y : ∇ℝ | x = y * y } : Set)
 ```
 * By `relate` axioms this implies what we need:
 ```Coq
-∀ x : CR, 0 < x → ((∃ y, x = y * y) : Prop)
+∀ x : CR, 0 < x → ((∃ y : CR, x = y * y) : Prop)
 ```
 
 Notes:
@@ -494,11 +494,11 @@ And, our relator brings it into Prop-level theorem in our constructive type theo
 <img src="diags/overview-relator.svg" width="80%">
 
 ```Coq
-∀ x : R, 0 < x → ({ y | x = y * y } : Set) (* Decidable = *)
+∀ x : ℝ, 0 < x → ({ y : ℝ | x = y * y } : Set) (* Decidable = *)
 
-    ∀ x : ∇R, 0 < x → { y : ∇R | x = y * y } (* Semidecidable = *)
+    ∀ x : ∇ℝ, 0 < x → { y : ∇ℝ | x = y * y } (* Semidecidable = *)
 
-        ∀ x : CR, 0 < x → ((∃ y, x = y * y) : Prop)
+        ∀ x : CR, 0 < x → ((∃ y : CR, x = y * y) : Prop)
 ```
 
 ----
@@ -512,7 +512,7 @@ And, our relator brings it into Prop-level theorem in our constructive type theo
 * Naturally defined lifting for constants, functions, relations
 
 ```Coq [1|3|4-5|7-8]
-Parameter relator : CR → ∇R. (* simplified version *)
+Parameter relator : CR → ∇ℝ.
 ...
 Axiom relator_constant0 : relator CR0 = unit∇ 0.
 Axiom relator_addition : ∀ x y, relator (x + y) = 
@@ -521,6 +521,7 @@ Axiom relator_addition : ∀ x y, relator (x + y) =
 Axiom relator_lt : ∀ x y, x < y = 
   (lift_domain_binary∇ (<)) (relator x) (relator y).
 ```
+(simplified version)
 
 >>>>
 
