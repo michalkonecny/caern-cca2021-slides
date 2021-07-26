@@ -494,9 +494,9 @@ And, our relator brings it into Prop-level theorem in our constructive type theo
 <img src="diags/overview-relator.svg" width="80%">
 
 ```Coq
-∀ x : ℝ, 0 < x → ({ y : ℝ | x = y * y } : Set) (* Decidable = *)
+∀ x : ℝ, 0 < x → ({ y : ℝ | x = y * y } : Set) (* Decidable < *)
 
-    ∀ x : ∇ℝ, 0 < x → { y : ∇ℝ | x = y * y } (* Semidecidable = *)
+    ∀ x : ∇ℝ, 0 < x → { y : ∇ℝ | x = y * y } (* Semidecidable < *)
 
         ∀ x : CR, 0 < x → ((∃ y : CR, x = y * y) : Prop)
 ```
