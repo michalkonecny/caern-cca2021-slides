@@ -536,8 +536,42 @@ Axiom relator_lt : ∀ x y, x < y =
 ----
 ### Reliability
 
+* Need to trust:
+  * Coq core, Coq extraction
+  * Haskell compiler, base libraries
+  * CDAR, AERN2
+
 ----
+
 ### Smooth development
+
+* Fact about Coq standard $\RR$ available, eg Coquelicot
+* Coq tactics help transfer
+* Specifications are readable
+* Algorithms readability an issue, but can be improved
+* Extracted code somewhat readable:
 
 ----
 ### Execution speed
+
+<img src="diags/bench-timing.png">
+
+$\tiny\text{(i7-4710MQ CPU, 16GB RAM, Ubuntu 18.04, Haskell Stackage LTS 17.2)}$
+
+>>>>
+
+## Summary
+
+* Progress towards practical certified efficient reals
+* Using Coq, Coq standard reals, Haskell/AERN2
+* With new axiomatisation of constructive reals
+
+<br/>
+<br/>
+
+## Future work
+
+* Prove consistency and completeness of axioms
+* Multivalued limits
+* More programs, eg trigs, linear algebra, theorem proving, optimisation, ODE/PDE integration
+* Extraction to other frameworks (CDAR, iRRAM, Ariadne)
