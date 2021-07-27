@@ -6,6 +6,8 @@
 |:---------------:|:----------:|:----------------:|
 |Aston University|KAIST|Kyoto University|
 
+27/07/2021, CCA 2021  <!-- .element: style="font-size: 70%;" -->
+
 Notes:
 
 Hello everyone,  I will talk about joint work with Sewon Park and Holger Thies on a new approach to developing certified exact real programs using the Coq proof assistant and the Haskell library AERN.
@@ -29,7 +31,7 @@ From Coq Proofs to <br/> Certified Exact Real Computation in AERN
 Notes:
 
 1. The plan is to start with a reminder of what exact real computation looks like using a few examples, and why it is desirable to do a formal verification / certification of such programs.
-2. Then I will review several existing approaches and show how ours differs from them,
+2. Then I will review several existing approaches and show they differ and what they have in commonc,
 3. followed by key details of our approach, namely formal axiomatisation of the real numbers
 4. and their relation to standard classical real numbers present in Coq.
 5. Finally, I will evaluate the approach from various angles and outline further work.
@@ -50,7 +52,7 @@ Let us remind ourselves of its subtleties.
 
 ### Limits
 
-```Haskell [-|2-3|5-10]
+```Haskell [1-3|8-10|5-6]
 sqrt_approx x n =
  let heron_step y = (y + x/y)/2 in
  (iterate heron_step 1) !! n
@@ -99,7 +101,7 @@ We need to certify this assumption if we use this approach.
 
 To avoid parallelism, we tend to use a limit and the select/choose command to compute an approximation.  A select is non-deterministic, ie the two semi-decidable conditions sometimes both hold and the select can choose freely between the branches.  Limit here has to work for a multi-valued function and we want a guarantee that the result is single-valued.
 
-----
+<!-- ----
 
 ### Non-extensionality, search
 
@@ -114,21 +116,17 @@ magnitude1 x =
 <a href="https://www.geogebra.org/m/cgqkwfeb">
 $\tiny\text{(GeoGebra source)}$</a>
 
-<!-- $$\scriptsize
-\forall x, 0 < x \leq 0.5 \implies \frac{1}{2^{m_1(x)+2}} < x \leq \frac{1}{2^{m_1(x)}}
-$$ -->
-
 Notes:
 
 This program computes a version **of integer logarithm** for x in this domain.  As integer logarithm (like the floor function) is discontinuous, we cannot compute it.  Instead we need to compute a multivalued (non-deterministic, non-extensional) version with a loosened specification.  Support for such non-extensional functions is unavoidable in ERC.
 
 Another notable feature of this program is **unguarded recursion/search**.  
 
-? This poses a challenge for formalization since proof assistants usually strongly encourage syntactically guarded recursion.
+? This poses a challenge for formalization since proof assistants usually strongly encourage syntactically guarded recursion. -->
 
 ----
 
-## Why *certified* exact real computation?
+### Why *certified* exact real computation?
 
 Limits, non-determinism can easily go wrong
 <br/>
@@ -143,11 +141,15 @@ Limits, non-determinism can easily go wrong
   * Small trusted base
   
 * Smooth development
-  * specification, algorithms and verification
+  * Specification, algorithms and proofs
   * Readable algorithms
 
 * Fast execution 
   * eg like iRRAM, Ariadne, CDAR, AERN
+
+Notes:
+
+It should not take too long to write the specification and the verified algorithm.
 
 >>>>
 
@@ -163,6 +165,10 @@ Limits, non-determinism can easily go wrong
 
 * Access to classical theorems on $\RR$
 
+Notes:
+
+There are already various approaches to certified ERC.  How does ours differ and how it build on existing work?  Approaches differ in their choice of logic and choice of real type, which usually impacts the size of trusted base and access to existing classical theorems (if any).
+
 ----
 
 ### Logic (1/2)
@@ -175,6 +181,15 @@ Limits, non-determinism can easily go wrong
 
 * Dependently-typed
   * `max:` `$\small\forall (x\, y:\text{R}), \{r\,|\,(x>y \to r=x)\land\ldots\}$`
+  * proofs = programs
+
+Notes:
+
+First we need a sufficiently powerful logic.  Some proof assistants, including Isabelle, support a **higher-order logic**, where one would clearly separate definitions of terms and programs from the statements and proofs of their properties.  Here, the theorem says that if r is the result (of type real) of calling function max for x, y then r equals the larger of x, y.
+
+On the other hand, assistants such as Coq, Agda and Lean are based on a **dependently-typed logic** where the program and its specification are mingled.  For example, here the **return type** of max already expresses that the return value equals the larger of x, y.  Writing the program for max and proving its specification is also mingled and using the same language.
+
+**We chose the dependant-type approach and the proof assistant Coq.**
 
 ----
 <!-- .slide: data-auto-animate -->
@@ -209,6 +224,15 @@ e.g.:
 
 * `$\scriptsize\forall x y : \RR, \{x > y\} + \{x = y\} + \{x < y\}$` KO
 
+Notes:
+
+Proofs as programs works well for constructive proofs.  Proofs of specification can also use constructive reasoning but does not have to.  
+Many developers find it easier to use classical reasoning when verifying real number properties and it would be convenient if we could use the existing libraries of classically proved theorems.  Thus we want both: purely constructive reasoning about how result values depend on input values + more flexible reasoning about the (dependent) type of result values.
+
+We will use the Coq conventions to differentiate between constructive and classical constructions.  The type Set is normally reserved for types of constructive values while Prop is a type of statements for which we do not assume any constructive content.  For example, a **constructive or**, applied to constructive sets gives a constructive disjoint union of these sets, and uses a notation that reminds us of this fact, unlike the usual notation for logical or.  For example, real order trichotomy holds classically but not constructively since real order is only semi-decidable.
+
+Similarly, the constructive existential quantifier gives a construction (rather than just an assumption of existence) of the witness with the proof that it is a witness.
+
 ----
 ### Logic (2/2)
 <!-- .slide: data-auto-animate -->
@@ -237,6 +261,29 @@ e.g.:
 
 <img src="diags/overview-CReal-vs-R.svg" width="100%">
 
+Notes:
+
+This diagram shows how due to this dual world we usually have two real number types in Coq:  The classical real numbers and the constructive real numbers.  This picture is true of the Coq standard library as of recent versions.  The Coq libraries CoRN and Incone provide their own constructive real numbers and means to derive exact real programs mingled with their specifications and certifications.  These programs can be executed directly within Coq, or extracted to behaviourally equivalent Haskell or OCaml programs.  In CoRN both the program and its correctness verification use Set constructive reasoning.  In Incone the correctness reasoning can use classical logic.
+
+In both CoRN and Incone, the formalization works directly with names of real numbers rather than real numbers.  Names are mapped to real numbers via a suitable representation, which are always redundant:
+
+----
+
+### Types of real numbers
+<!-- .slide: data-auto-animate data-auto-animate-restart -->
+
+* concrete using names
+  * e.g., `$\scriptsize R = \{\xi : N \to Q \,|\,\xi \text{ is fast convergent} \} / (==)$`
+  
+  * the quotient often ignored, working with names
+
+
+<img src="diags/names.png" width="50%">
+
+Notes:
+
+Here, ξ is a name of a real number using a fast Cauchy representation of real numbers.
+
 ----
 
 ### Types of real numbers
@@ -253,6 +300,42 @@ e.g.:
 
     * specification: &nbsp; `$\scriptsize+\text{-comm} : \forall x\,y, x{+}y = y{+}x,\,\ldots$`
 
+Notes:
+
+Since there are many representations of the reals, some simpler and some more complicated, aimed at efficient execution, it is helpful to abstract away from names via an axiomatisation.
+
+In CoRN and Coq standard library, there is an axiomatisation of constructive real numbers independent of names: 
+
+----
+
+### Types of real numbers
+<!-- .slide: data-auto-animate -->
+
+<img src="diags/overview-CReal-CR-R.svg" width="100%">
+
+Notes:
+
+The axiomatisation contains a Prop-based order which may be reasoned about classically, although as far as I understand, is not normally done in CoRN or the standard library.
+
+This axiomatisation caters for models with names as can be seen in its intensional equality:
+
+----
+
+### Types of real numbers
+<!-- .slide: data-auto-animate -->
+
+* concrete using names
+* abstract using axioms
+  * notion of equality
+    * extensional: `$\scriptsize x = y \text{ with } x < y ∨ x = y ∨ x > y$`
+    * intensional: `$\scriptsize x == y  \;~\;  ¬ (x > y) ∧ ¬ (x < y)$`
+
+<img src="diags/names.png" width="50%">
+
+Notes:
+
+We prefer an axiomatisation with extensional equality in which the order trichotomy classically holds.  This approach also makes it easier to connect the constructive reals to the Coq classical reals.
+
 ----
 
 ### Types of real numbers
@@ -267,26 +350,6 @@ e.g.:
 
   * or axioms corresponding to more convenient/efficient real operations
     * e.g., `$\scriptsize\mathrm{of\_Q} : Q → R$`
-
-----
-
-### Types of real numbers
-<!-- .slide: data-auto-animate -->
-
-* concrete using names
-* abstract using axioms
-  * notion of equality
-    * extensional: `$\scriptsize x = y \text{ with } x < y ∨ x = y ∨ x > y$`
-    * intensional: `$\scriptsize x == y  \;:=\;  ¬ (x > y) ∧ ¬ (x < y)$`
-
-<img src="diags/names.png" width="50%">
-
-----
-
-### Types of real numbers
-<!-- .slide: data-auto-animate -->
-
-<img src="diags/overview-CReal-CR-R.svg" width="100%">
 
 ----
 
@@ -321,7 +384,7 @@ Notes:
 
 ## Our axiomatisation of constructive real numbers
 
-* Constructive real field
+* Real field
 * Order and identity (classical)
 * Semidecidable tests, partial functions
 * Non-deterministic choice
@@ -331,12 +394,12 @@ Notes:
 
 ----
 <!-- .slide: data-auto-animate -->
-### Constructive real field
+### Real field
 
 ```Coq
-Parameter CR : Set.
-Parameter CR0 : CR.
-Parameter CR+ : CR -> CR -> CR.
+Axiom CR : Set.
+Axiom CR0 : CR.
+Axiom CR+ : CR -> CR -> CR.
 ...
 ```
 
@@ -344,38 +407,38 @@ Parameter CR+ : CR -> CR -> CR.
 
 ----
 <!-- .slide: data-auto-animate -->
-### Constructive real field
+### Real field
 
 ```Coq
-Parameter CR : Set.
-Parameter CR0 : CR.
-Parameter CR+ : CR -> CR -> CR.
+Axiom CR : Set.
+Axiom CR0 : CR.
+Axiom CR+ : CR -> CR -> CR.
 ...
 ```
 
 ### Order and identity (classical)
 
 ```Coq
-Parameter CRlt : CR -> CR -> Prop. (* Notation "<" *)
+Axiom CRlt : CR -> CR -> Prop. (* Notation "<" *)
 Axiom CRtotal_order : 
   ∀ r1 r2 : CR, r1 < r2 \/ r1 = r2 \/ r2 < r1.
 ```
 
 ----
 <!-- .slide: data-auto-animate -->
-### Constructive real field
+### Real field
 
 ```Coq
-Parameter CR : Set.
-Parameter CR0 : CR.
-Parameter CR+ : CR -> CR -> CR.
+Axiom CR : Set.
+Axiom CR0 : CR.
+Axiom CR+ : CR -> CR -> CR.
 ...
 ```
 
 ### Order and identity (classical)
 
 ```Coq
-Parameter CRlt : CR -> CR -> Prop. (* Notation "<" *)
+Axiom CRlt : CR -> CR -> Prop. (* Notation "<" *)
 Axiom CRtotal_order : 
   ∀ r1 r2 : CR, r1 < r2 \/ r1 = r2 \/ r2 < r1.
 ```
@@ -392,10 +455,10 @@ Axiom CRtotal_order :
 |:--:|:--:|
 | `x<y : Prop` | `semidec(x<y) : Set` |
 
-```Coq [1-3|5-7|9,11|9,13]
-Parameter K : Set.
-Parameter trueK : K.
-Parameter falseK : K.
+```Coq [1-3|5-7|9,11]
+Axiom K : Set.
+Axiom trueK : K.
+Axiom falseK : K.
  
 Definition upK : K -> Prop := fun k : K => k = trueK.
  
@@ -404,8 +467,6 @@ Definition semidec := fun P : Prop => {k : K | upK k <-> P}.
 Usage:
 
 Axiom CRlt_semidec : ∀ x y : CR, semidec (x < y).
-
-Parameter CRinv : ∀ {z}, z <> CR0 -> CR.
 ```
 
 ----
@@ -415,38 +476,35 @@ Parameter CRinv : ∀ {z}, z <> CR0 -> CR.
 * two Kleeneans, at least one is True (classically)
 * can non-deterministically choose (constructively):
 
-```Coq [1-2|4-6|8-12]
-Parameter select : 
-  ∀ k l : K, upK k \/ upK l -> M ({ upK k } + { upK l }).
- 
-Definition choose : 
+```Coq [1-3|5-9]
+Definition select : 
   ∀ p q, semidec p -> semidec q -> p \/ q -> M ({p}+{q}).  
 Proof. ... (* using select *)
 
-Usage:
+example usage:
 
 Definition M_split : 
   ∀ x y ε, ε > CR0 -> M ({x > y-ε} + {y > x-ε}).
-Proof. ... (* using choose *)
+Proof. ... (* using select *)
 
 ```
 
-----
+<!-- ----
 
 ### Multivalued/non-deterministic computation monad
 
 ```Coq [1-5|7|9-10]
-Parameter M : Type -> Type.
-Parameter liftM : ∀ A B, (A -> B) -> M A -> M B.
-Parameter unitM : ∀ T : Type, T -> M T.
-Parameter multM : ∀ T : Type, M (M T) -> M T.
+Axiom M : Type -> Type.
+Axiom liftM : ∀ A B, (A -> B) -> M A -> M B.
+Axiom unitM : ∀ T : Type, T -> M T.
+Axiom multM : ∀ T : Type, M (M T) -> M T.
 ...
 
 Definition singletonM : ∀ A, isSubsingleton A -> M A -> A.
 
 Definition countableLiftM : 
   ∀ P : nat -> Type, (∀ n, M (P n)) -> M (∀ n, P n).
-```
+``` -->
 
 ----
 
@@ -472,7 +530,8 @@ Axiom limit :
 
 Non-deterministic sequence, deterministic result
 
-```Coq [8-10,12|8-12]
+```Coq [9-11,13|12]
+Definition singletonM : ∀ A, isSubsingleton A -> M A -> A.
 Definition countableLiftM : 
   ∀ P : nat -> Type, (∀ n, M (P n)) -> M (∀ n, P n).
 
@@ -498,7 +557,14 @@ realmax_nondeterministic x y =
                 then x      else y
 ```
 
-<img src="diags/realmax-coq-outline.png" width="50%">
+<img src="diags/realmax-coq-outline-extracted.png" width="90%">
+
+<a href="https://github.com/holgerthies/coq-aern/blob/d600a52e4fa0ad0750dd1ecf7d3c1c15b9b951c3/formalization/Minmax.v#L111">
+$\tiny\text{(Full Coq source)}$
+</a>
+<a href="https://github.com/holgerthies/coq-aern/blob/d600a52e4fa0ad0750dd1ecf7d3c1c15b9b951c3/extracted-examples/src/Max.hs#L42">
+$\tiny\text{(Full Haskell source)}$
+</a>
 
 ----
 <!-- .slide: data-auto-animate -->
@@ -550,7 +616,7 @@ And, our relator brings it into Prop-level theorem in our constructive type theo
 * Naturally defined lifting for constants, functions, relations
 
 ```Coq [1|3|4-5|7-8]
-Parameter relator : CR → ∇ℝ.
+Axiom relator : CR → ∇ℝ.
 ...
 Axiom relator_constant0 : relator CR0 = unit∇ 0.
 Axiom relator_addition : ∀ x y, relator (x + y) = 
@@ -574,8 +640,11 @@ Axiom relator_lt : ∀ x y, x < y =
 ----
 ### Reliability
 
-* Need to trust:
+<br/>
+
+* Need to trust **only**:
   * Coq core, Coq extraction
+  
   * Haskell compiler, base libraries
   * CDAR, AERN2
 
@@ -584,10 +653,10 @@ Axiom relator_lt : ∀ x y, x < y =
 ### Smooth development
 
 * Fact about Coq standard $\RR$ available, eg Coquelicot
+
 * Coq tactics help transfer
 * Specifications are readable
 * Algorithms readability an issue, but can be improved
-* Extracted code somewhat readable:
 
 ----
 ### Execution speed
@@ -609,7 +678,14 @@ $\tiny\text{(i7-4710MQ CPU, 16GB RAM, Ubuntu 18.04, Haskell Stackage LTS 17.2)}$
 
 ## Future work
 
-* Prove consistency and completeness of axioms
-* Multivalued limits
+* Formally prove consistency and completeness of axioms
+* Non-deterministic limits (eg complex sqrt)
 * More programs, eg trigs, linear algebra, theorem proving, optimisation, ODE/PDE integration
 * Extraction to other frameworks (CDAR, iRRAM, Ariadne)
+* Alternative execution inside Coq via Incone, CoRN
+
+----
+
+## Thank you!
+
+<img src="diags/overview-relator.svg" width="100%">
