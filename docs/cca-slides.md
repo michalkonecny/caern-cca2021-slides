@@ -91,15 +91,11 @@ realmax_nondeterministic x y =
 ```
 
 <img src="diags/max_fg.svg" width="60%" class="fragment" data-fragment-index="2">
+
 <a href="https://www.geogebra.org/calculator/eb52xeed">
 $\tiny\text{(animated version)}$</a>
 
-Note:
 
-Semi-decidability of order means that we cannot branch based on order the usual way.  This if-then-else actually works in AERN, but it is redefined to execute both branches in parallel while the lazy Boolean condition is undecided and merge the information from both branches, assuming that they compute the same number if the condition is never decided (ie x = y in this case).
-We need to certify this assumption if we use this approach.
-
-To avoid parallelism, we tend to use a limit and the select/choose command to compute an approximation.  A select is non-deterministic, ie the two semi-decidable conditions sometimes both hold and the select can choose freely between the branches.  Limit here has to work for a multi-valued function and we want a guarantee that the result is single-valued.
 
 <!-- ----
 
