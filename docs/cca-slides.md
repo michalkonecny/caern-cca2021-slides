@@ -95,9 +95,14 @@ realmax_nondeterministic x y =
 <a href="https://www.geogebra.org/calculator/eb52xeed">
 $\tiny\text{(animated version)}$</a>
 
+Note:
 
+Semi-decidability of order means that we cannot branch based on order the usual way.  This if-then-else actually works in AERN, but it is redefined to execute both branches in parallel while the lazy Boolean condition is undecided and merge the information from both branches, assuming that they compute the same number if the condition is never decided (ie x = y in this case).
+We need to certify this assumption if we use this approach.
 
-<!-- ----
+To avoid parallelism, we tend to use a limit and the select/choose command to compute an approximation.  A select is non-deterministic, ie the two semi-decidable conditions sometimes both hold and the select can choose freely between the branches.  Limit here has to work for a multi-valued function and we want a guarantee that the result is single-valued.
+
+----
 
 ### Non-extensionality, search
 
@@ -118,7 +123,7 @@ This program computes a version **of integer logarithm** for x in this domain.  
 
 Another notable feature of this program is **unguarded recursion/search**.  
 
-? This poses a challenge for formalization since proof assistants usually strongly encourage syntactically guarded recursion. -->
+? This poses a challenge for formalization since proof assistants usually strongly encourage syntactically guarded recursion.
 
 ----
 
@@ -255,7 +260,7 @@ Similarly, the constructive existential quantifier gives a construction (rather 
   </tr>
 </table>
 
-<img src="diags/overview-CReal-vs-R.svg" width="100%">
+<img src="diags/overview-CReal-vs-R.svg" width="90%">
 
 Notes:
 
@@ -485,7 +490,7 @@ Proof. ... (* using select *)
 
 ```
 
-<!-- ----
+----
 
 ### Multivalued/non-deterministic computation monad
 
@@ -500,7 +505,7 @@ Definition singletonM : ∀ A, isSubsingleton A -> M A -> A.
 
 Definition countableLiftM : 
   ∀ P : nat -> Type, (∀ n, M (P n)) -> M (∀ n, P n).
-``` -->
+```
 
 ----
 
